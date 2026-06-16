@@ -23,10 +23,10 @@ namespace PRN222_assigment2.Pages.Account
         public UserSearchViewModel ViewModel { get; set; } = new();
 
         [BindProperty(SupportsGet = true, Name = "sortBy")]
-        public string SortBy { get; set; } = "fullName";
+        public string? SortBy { get; set; } = "fullName";
 
         [BindProperty(SupportsGet = true, Name = "sortOrder")]
-        public string SortOrder { get; set; } = "asc";
+        public string? SortOrder { get; set; } = "asc";
 
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
@@ -37,28 +37,30 @@ namespace PRN222_assigment2.Pages.Account
         public async Task OnGetAsync()
         {
             var allUsers = await _userService.GetAllUsersAsync();
-            IEnumerable<UserDto> filteredUsers = allUsers;
+            var nonAdminUsers = allUsers.Where(u => !string.Equals(u.Role, "Admin", System.StringComparison.OrdinalIgnoreCase)).ToList();
+            IEnumerable<UserDto> filteredUsers = nonAdminUsers;
 
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
                 var term = SearchTerm.Trim().ToLower();
                 filteredUsers = filteredUsers.Where(u =>
-                    u.FullName.ToLower().Contains(term) ||
-                    u.Email.ToLower().Contains(term) ||
-                    u.Username.ToLower().Contains(term));
+                    (u.FullName ?? "").ToLower().Contains(term) ||
+                    (u.Email ?? "").ToLower().Contains(term) ||
+                    (u.Username ?? "").ToLower().Contains(term));
             }
 
             if (!string.IsNullOrWhiteSpace(RoleFilter))
             {
-                filteredUsers = filteredUsers.Where(u => u.Role == RoleFilter);
+                filteredUsers = filteredUsers.Where(u => string.Equals(u.Role, RoleFilter, System.StringComparison.OrdinalIgnoreCase));
             }
 
-            filteredUsers = SortBy.ToLower() switch
+            var sortByValue = (SortBy ?? "fullName").ToLower();
+            filteredUsers = sortByValue switch
             {
-                "email"    => SortOrder == "desc" ? filteredUsers.OrderByDescending(u => u.Email)    : filteredUsers.OrderBy(u => u.Email),
-                "role"     => SortOrder == "desc" ? filteredUsers.OrderByDescending(u => u.Role)     : filteredUsers.OrderBy(u => u.Role),
-                "username" => SortOrder == "desc" ? filteredUsers.OrderByDescending(u => u.Username) : filteredUsers.OrderBy(u => u.Username),
-                _          => SortOrder == "desc" ? filteredUsers.OrderByDescending(u => u.FullName) : filteredUsers.OrderBy(u => u.FullName),
+                "email"    => string.Equals(SortOrder, "desc", System.StringComparison.OrdinalIgnoreCase) ? filteredUsers.OrderByDescending(u => u.Email ?? "")    : filteredUsers.OrderBy(u => u.Email ?? ""),
+                "role"     => string.Equals(SortOrder, "desc", System.StringComparison.OrdinalIgnoreCase) ? filteredUsers.OrderByDescending(u => u.Role ?? "")     : filteredUsers.OrderBy(u => u.Role ?? ""),
+                "username" => string.Equals(SortOrder, "desc", System.StringComparison.OrdinalIgnoreCase) ? filteredUsers.OrderByDescending(u => u.Username ?? "") : filteredUsers.OrderBy(u => u.Username ?? ""),
+                _          => string.Equals(SortOrder, "desc", System.StringComparison.OrdinalIgnoreCase) ? filteredUsers.OrderByDescending(u => u.FullName ?? "") : filteredUsers.OrderBy(u => u.FullName ?? ""),
             };
 
             ViewModel = new UserSearchViewModel
@@ -66,7 +68,7 @@ namespace PRN222_assigment2.Pages.Account
                 SearchTerm    = SearchTerm,
                 RoleFilter    = RoleFilter,
                 Users         = filteredUsers,
-                TotalCount    = allUsers.Count(),
+                TotalCount    = nonAdminUsers.Count,
                 FilteredCount = filteredUsers.Count()
             };
         }
