@@ -1,0 +1,38 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=YOUR_SERVER;Database=Prn222_assigment;User Id=YOUR_USER;Password=YOUR_PASSWORD;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+  },
+  "AdminAccount": {
+    "Email": "admin@fpt.edu.vn",
+    "Password": "YOUR_ADMIN_PASSWORD"
+  },
+  "GeminiSettings": {
+    "ApiKey": "YOUR_GEMINI_API_KEY",
+    "Model": "gemini-2.5-flash",
+    "BaseUrl": "https://generativelanguage.googleapis.com/v1beta/models",
+    "MaxOutputTokens": 1024,
+    "Temperature": 0.3
+  },
+  "Ollama": {
+    "Enabled": "false",
+    "Url": "http://localhost:11434/api/generate",
+    "Model": "llama3"
+  },
+  "HuggingFaceToken": "YOUR_HUGGING_FACE_TOKEN",
+  "OpenAIKey": "YOUR_OPENAI_KEY",
+  "DefaultStudentPassword": "FptStudent@123",
+  "EmailSettings": {
+    "SmtpHost": "smtp.gmail.com",
+    "SmtpPort": "587",
+    "SenderEmail": "YOUR_SENDER_EMAIL@gmail.com",
+    "SenderPassword": "YOUR_SENDER_PASSWORD",
+    "EnableSsl": "true"
+  }
+}
