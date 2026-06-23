@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36429.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN222_assigment2", "PRN222_assigment2\PRN222_assigment2.csproj", "{31F7752D-EE84-4A39-B7BF-ED60F0A5C235}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationLayer", "PRN222_assigment2\PresentationLayer.csproj", "{31F7752D-EE84-4A39-B7BF-ED60F0A5C235}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{42552DEF-8CA1-4775-920A-D71BD144E982}"
 EndProject

@@ -5,6 +5,7 @@ using BusinessLayer.Interfaces;
 using BusinessLayer.Services;
 using BusinessLayer.Services.Embedding;
 using BusinessLayer.Models;
+using PRN222_assigment2.Hubs;
 
 namespace PRN222_assigment2
 {
@@ -16,6 +17,7 @@ namespace PRN222_assigment2
 
             // Add Razor Pages instead of MVC
             builder.Services.AddRazorPages();
+            builder.Services.AddSignalR();
 
             builder.Services.AddDbContext<Prn222AssigmentContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -193,6 +195,7 @@ namespace PRN222_assigment2
 
             // Map Razor Pages thay vì MapControllerRoute
             app.MapRazorPages();
+            app.MapHub<NewsHub>("/newsHub");
 
             app.Run();
         }
