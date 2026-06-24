@@ -952,7 +952,24 @@ select.form-glass option { background-color: var(--bg-dark); color: #fff; }
     .citation-drawer { width: 260px; min-width: 240px; }
 }
 
-@media (max-width: 576px) {
-    .main-content-area { padding: 16px 0 32px; }
-    .card-glass { padding: 18px; border-radius: var(--radius-md); }
+/* General Area layouts */
+.main-content-area {
+    flex-grow: 1;
+    padding: 40px 20px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(8, 10, 15, 0.1);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
 }

@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -199,6 +202,42 @@ namespace PRN222_assigment2.Pages.Benchmark
                 Precision    = r.ContextPrecisionScore ?? 0.0,
                 Recall       = r.ContextRecallScore ?? 0.0
             }));
+        }
+
+        // GET: Export benchmark results to CSV file
+        public async Task<IActionResult> OnGetExportCSVAsync(int experimentId)
+        {
+            var results = await _benchmarkService.GetResultsByExperimentIdAsync(experimentId);
+            var experiments = await _benchmarkService.GetAllExperimentsAsync();
+            var experiment = experiments.FirstOrDefault(e => e.ExperimentId == experimentId);
+            var expName = experiment?.ExperimentName ?? "Experiment";
+
+            var sb = new StringBuilder();
+            // UTF-8 BOM to support Vietnamese character displays in Excel
+            sb.Append('\uFEFF');
+            
+            // Header Row
+            sb.AppendLine("ID,Question,Ground Truth,Model Response,Latency (ms),Tokens In,Tokens Out,Faithfulness,Answer Relevance,Context Precision,Context Recall,Tested At");
+
+            foreach (var r in results)
+            {
+                var question = EscapeCsv(r.Question?.Question ?? string.Empty);
+                var groundTruth = EscapeCsv(r.Question?.GroundTruth ?? string.Empty);
+                var response = EscapeCsv(r.GeneratedResponse ?? string.Empty);
+                var testedAt = r.TestedAt?.ToString("dd/MM/yyyy HH:mm") ?? "N/A";
+
+                sb.AppendLine($"{r.ResultId},\"{question}\",\"{groundTruth}\",\"{response}\",{r.LatencyMilliseconds},{r.TokensIn},{r.TokensOut},{r.FaithfulnessScore ?? 0.0},{r.AnswerRelevanceScore ?? 0.0},{r.ContextPrecisionScore ?? 0.0},{r.ContextRecallScore ?? 0.0},{testedAt}");
+            }
+
+            var cleanName = string.Concat(expName.Split(Path.GetInvalidFileNameChars())).Replace(" ", "_");
+            var fileName = $"{cleanName}_BenchmarkResults.csv";
+            return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/csv", fileName);
+        }
+
+        private string EscapeCsv(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return string.Empty;
+            return text.Replace("\"", "\"\"");
         }
     }
 }

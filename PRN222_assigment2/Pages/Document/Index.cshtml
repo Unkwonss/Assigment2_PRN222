@@ -768,6 +768,9 @@
                                     <button class="btn btn-sm btn-outline-glass py-1 px-2 d-flex align-items-center gap-1" onclick="openViewChunksModal(${doc.documentId})" style="font-size:0.75rem;">
                                         <i class="bi bi-eye-fill"></i> Xem
                                     </button>
+                                    <button class="btn btn-sm btn-outline-glass py-1 px-2 d-flex align-items-center gap-1" onclick="downloadExtractedText(${doc.documentId})" style="font-size:0.75rem;" title="Tải văn bản trích xuất">
+                                        <i class="bi bi-file-earmark-arrow-down"></i> Tải Text
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1017,6 +1020,11 @@
                 updateHelpTexts();
             });
         });
+
+        // Download physical text file containing extracted content
+        function downloadExtractedText(docId) {
+            window.open('/Document/Index?handler=DownloadExtractedText&documentId=' + docId, '_blank');
+        }
     </script>
 }
 

@@ -267,33 +267,7 @@
 
 @section Scripts {
 <script src="~/lib/signalr/signalr.min.js"></script>
-<style>
-.signalr-status { position:fixed; bottom:12px; right:12px; z-index:9999; display:flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:.7rem; backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.1); }
-.signalr-status.connected { background:rgba(16,185,129,.15); color:#34d399; border-color:rgba(16,185,129,.3); }
-.signalr-status.disconnected { background:rgba(239,68,68,.15); color:#f87171; border-color:rgba(239,68,68,.3); }
-.signalr-status.connecting { background:rgba(251,191,36,.15); color:#fbbf24; border-color:rgba(251,191,36,.3); }
-.signalr-dot { width:8px; height:8px; border-radius:50%; }
-.signalr-status.connected .signalr-dot { background:#34d399; box-shadow:0 0 6px #34d399; }
-.signalr-status.disconnected .signalr-dot { background:#f87171; }
-.signalr-status.connecting .signalr-dot { background:#fbbf24; animation:pulse 1s infinite; }
-@@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
-.upload-step { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); transition: all .3s; }
-.upload-step.step-active { background: rgba(99,102,241,.15); border-color: rgba(99,102,241,.4); }
-.upload-step.step-done { background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.35); }
-.upload-step.step-error { background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.35); }
-.upload-step .step-icon { font-size: 1.1rem; width: 24px; text-align: center; }
-.upload-step.step-active .step-icon { color: #818cf8; }
-.upload-step.step-done .step-icon { color: #10b981; }
-.upload-step.step-error .step-icon { color: #ef4444; }
-.doc-item { display:flex; align-items:center; gap:8px; padding:5px 8px; border-radius:8px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); margin-bottom:4px; font-size:.75rem; cursor:default; }
-.doc-item:hover { background:rgba(255,255,255,.07); }
-.doc-item .doc-icon { font-size:1rem; }
-.doc-item.pdf .doc-icon { color:#f87171; }
-.doc-item.docx .doc-icon { color:#60a5fa; }
-.doc-item.pptx .doc-icon { color:#fb923c; }
-.doc-item.txt .doc-icon { color:#a3e635; }
-.doc-badge { font-size:.6rem; padding:1px 5px; border-radius:20px; background:rgba(16,185,129,.2); color:#34d399; border:1px solid rgba(16,185,129,.3); }
-</style>
+
     <script>
         var activeSessionId = null;
         var activeCitations = {};
