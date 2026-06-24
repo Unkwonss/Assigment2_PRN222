@@ -1,127 +1,177 @@
 ﻿@page
 @model PRN222_assigment2.Pages.Benchmark.DashboardModel
-
-
 @{
     ViewData["Title"] = "Benchmark Dashboard";
-    
-    // Find highest MRR for highlighting
+
     double maxMrr = Model.Results.Any() ? Model.Results.Max(x => x.MRR) : 0;
-    
-    // Collect unique chunk strategies for filter
+
     var strategies = Model.Results.Select(x => x.ChunkStrategy)
                           .Where(x => !string.IsNullOrEmpty(x))
                           .Distinct()
                           .ToList();
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4"><i class="bi bi-graph-up text-primary"></i> Đánh giá So sánh RAG Models</h2>
-
-    <!-- Filter & Export Controls -->
-    <div class="row mb-4 align-items-end">
-        <div class="col-md-4">
-            <label for="strategyFilter" class="form-label fw-bold">Lọc theo Chunking Strategy:</label>
-            <select id="strategyFilter" class="form-select">
-                <option value="">-- Tất cả Strategy --</option>
-                @foreach(var s in strategies)
-                {
-                    <option value="@s">@s</option>
-                }
-            </select>
+<div class="container-fluid px-4">
+    <div class="page-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+        <div>
+            <h2 class="card-title-gradient mb-1">
+                <i class="bi bi-graph-up-arrow text-glow"></i> Đánh giá So sánh RAG Models
+            </h2>
+            <p class="text-muted-custom mb-0">Phân tích hiệu năng Precision, Recall và MRR theo từng cấu hình mô hình</p>
         </div>
-        <div class="col-md-8 text-end">
-            <button class="btn btn-success" onclick="exportTableToCSV('benchmark_results.csv')">
-                <i class="bi bi-file-earmark-excel"></i> Xuất CSV
-            </button>
-        </div>
+        <a asp-page="/Benchmark/Index" class="btn btn-outline-glass d-flex align-items-center gap-2">
+            <i class="bi bi-arrow-left"></i> Về Benchmark Lab
+        </a>
     </div>
 
-    <!-- Charts Section -->
-    <div class="row mb-5">
-        <div class="col-md-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
-                    <h5 class="card-title fw-bold">Biểu đồ so sánh Precision@3 & Recall@3</h5>
+    <!-- Stats summary -->
+    @if (Model.Results.Any())
+    {
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-primary"><i class="bi bi-collection-fill"></i></div>
+                    <div>
+                        <div class="stat-value">@Model.Results.Count</div>
+                        <div class="stat-label">Kết quả test</div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <canvas id="metricsChart" height="100"></canvas>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-cyan"><i class="bi bi-bullseye"></i></div>
+                    <div>
+                        <div class="stat-value">@Model.Results.Average(x => x.Precision3).ToString("0.00")</div>
+                        <div class="stat-label">Precision@3 TB</div>
+                    </div>
                 </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-purple"><i class="bi bi-search"></i></div>
+                    <div>
+                        <div class="stat-value">@Model.Results.Average(x => x.Recall3).ToString("0.00")</div>
+                        <div class="stat-label">Recall@3 TB</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-green"><i class="bi bi-trophy-fill"></i></div>
+                    <div>
+                        <div class="stat-value">@maxMrr.ToString("0.00")</div>
+                        <div class="stat-label">MRR cao nhất</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Filter & Export -->
+    <div class="card-glass py-3 mb-4">
+        <div class="row align-items-end g-3">
+            <div class="col-md-5">
+                <label for="strategyFilter" class="form-label text-muted-custom mb-1">Lọc theo Chunking Strategy</label>
+                <select id="strategyFilter" class="form-select form-glass">
+                    <option value="">— Tất cả Strategy —</option>
+                    @foreach (var s in strategies)
+                    {
+                        <option value="@s">@s</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-7 text-md-end">
+                <button class="btn btn-glow-success d-inline-flex align-items-center gap-2" onclick="exportTableToCSV('benchmark_results.csv')">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Xuất CSV
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Data Table Section -->
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle mb-0" id="resultsTable">
-                    <thead class="table-dark">
+    <!-- Chart -->
+    <div class="card-glass mb-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-bar-chart-fill text-glow"></i>
+            <h5 class="text-white fw-bold mb-0">Biểu đồ Precision@3 &amp; Recall@3</h5>
+        </div>
+        <div class="chart-container">
+            <canvas id="metricsChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card-glass card-glass-flat">
+        <div class="table-responsive">
+            <table class="table table-glass align-middle mb-0" id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Chunk Strategy</th>
+                        <th>Precision@3</th>
+                        <th>Recall@3</th>
+                        <th>MRR</th>
+                        <th>Latency (ms)</th>
+                        <th>Thời gian test</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Results.Any())
+                    {
                         <tr>
-                            <th>Model</th>
-                            <th>Chunk Strategy</th>
-                            <th>Precision@3</th>
-                            <th>Recall@3</th>
-                            <th>MRR</th>
-                            <th>Avg Latency (ms)</th>
-                            <th>Thời gian test</th>
+                            <td colspan="7" class="text-center py-5 text-muted-custom">
+                                <i class="bi bi-inbox fs-2 d-block mb-2 opacity-50"></i>
+                                Không có dữ liệu benchmark nào.
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (!Model.Results.Any())
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Results)
                         {
-                            <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">Không có dữ liệu benchmark nào được tìm thấy.</td>
+                            bool isBest = item.MRR == maxMrr && maxMrr > 0;
+                            <tr class="data-row @(isBest ? "row-best" : "")" data-strategy="@item.ChunkStrategy">
+                                <td class="fw-semibold text-white">@item.ModelName</td>
+                                <td>
+                                    <span class="badge-glass badge-role-teacher">@(string.IsNullOrEmpty(item.ChunkStrategy) ? "N/A" : item.ChunkStrategy)</span>
+                                </td>
+                                <td>@item.Precision3.ToString("0.000")</td>
+                                <td>@item.Recall3.ToString("0.000")</td>
+                                <td>
+                                    @item.MRR.ToString("0.000")
+                                    @if (isBest)
+                                    {
+                                        <span class="badge-glass badge-best ms-1">BEST</span>
+                                    }
+                                </td>
+                                <td>@item.AvgLatencyMs.ToString("0.0")</td>
+                                <td class="text-muted-custom">@item.RunAt.ToString("dd/MM/yyyy HH:mm")</td>
                             </tr>
                         }
-                        else
-                        {
-                            foreach (var item in Model.Results)
-                            {
-                                bool isBest = (item.MRR == maxMrr && maxMrr > 0);
-                                <tr class="data-row @(isBest ? "table-success fw-bold" : "")" data-strategy="@item.ChunkStrategy">
-                                    <td>@item.ModelName</td>
-                                    <td>@(string.IsNullOrEmpty(item.ChunkStrategy) ? "N/A" : item.ChunkStrategy)</td>
-                                    <td>@item.Precision3.ToString("0.000")</td>
-                                    <td>@item.Recall3.ToString("0.000")</td>
-                                    <td>
-                                        @item.MRR.ToString("0.000")
-                                        @if(isBest) { <span class="badge bg-danger ms-1">BEST</span> }
-                                    </td>
-                                    <td>@item.AvgLatencyMs.ToString("0.0")</td>
-                                    <td>@item.RunAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script>
-        // Prepare Data for Chart
         const rawData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Results));
-        
         let chartInstance = null;
+
+        const chartColors = {
+            precision: { bg: 'rgba(99, 102, 241, 0.7)', border: '#6366f1' },
+            recall:    { bg: 'rgba(168, 85, 247, 0.7)', border: '#a855f7' }
+        };
 
         function renderChart(data) {
             const ctx = document.getElementById('metricsChart').getContext('2d');
-            
-            // Group data by Model Name (taking averages if multiple strategies exist)
             const grouped = {};
+
             data.forEach(item => {
                 let label = item.ModelName;
-                if(item.ChunkStrategy) label += " (" + item.ChunkStrategy + ")";
-                
-                if (!grouped[label]) {
-                    grouped[label] = { p: 0, r: 0, count: 0 };
-                }
+                if (item.ChunkStrategy) label += ' (' + item.ChunkStrategy + ')';
+                if (!grouped[label]) grouped[label] = { p: 0, r: 0, count: 0 };
                 grouped[label].p += item.Precision3;
                 grouped[label].r += item.Recall3;
                 grouped[label].count++;
@@ -131,101 +181,82 @@
             const precisionData = labels.map(l => grouped[l].p / grouped[l].count);
             const recallData = labels.map(l => grouped[l].r / grouped[l].count);
 
-            if(chartInstance) {
-                chartInstance.destroy();
-            }
+            if (chartInstance) chartInstance.destroy();
 
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
+                    labels,
                     datasets: [
                         {
                             label: 'Precision@3',
                             data: precisionData,
-                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
+                            backgroundColor: chartColors.precision.bg,
+                            borderColor: chartColors.precision.border,
+                            borderWidth: 1,
+                            borderRadius: 6
                         },
                         {
                             label: 'Recall@3',
                             data: recallData,
-                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1
+                            backgroundColor: chartColors.recall.bg,
+                            borderColor: chartColors.recall.border,
+                            borderWidth: 1,
+                            borderRadius: 6
                         }
                     ]
                 },
                 options: {
                     responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans' } }
+                        }
+                    },
                     scales: {
+                        x: {
+                            ticks: { color: '#64748b', maxRotation: 45 },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
                         y: {
                             beginAtZero: true,
-                            max: 1.0
+                            max: 1.0,
+                            ticks: { color: '#64748b' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
                         }
                     }
                 }
             });
         }
 
-        // Initialize Chart
         renderChart(rawData);
 
-        // Filter Logic
-        document.getElementById('strategyFilter').addEventListener('change', function() {
+        document.getElementById('strategyFilter').addEventListener('change', function () {
             const selected = this.value;
-            const rows = document.querySelectorAll('.data-row');
-            
-            const filteredData = [];
-            
-            rows.forEach(row => {
+            document.querySelectorAll('.data-row').forEach(row => {
                 const strategy = row.getAttribute('data-strategy');
-                if (selected === "" || strategy === selected) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = (selected === '' || strategy === selected) ? '' : 'none';
             });
-
-            if (selected === "") {
-                renderChart(rawData);
-            } else {
-                renderChart(rawData.filter(x => x.ChunkStrategy === selected));
-            }
+            renderChart(selected === '' ? rawData : rawData.filter(x => x.ChunkStrategy === selected));
         });
 
-        // Export to CSV Logic
         function exportTableToCSV(filename) {
             const rows = document.querySelectorAll('#resultsTable tr');
             let csv = [];
             for (let i = 0; i < rows.length; i++) {
+                if (rows[i].style.display === 'none') continue;
                 let row = [], cols = rows[i].querySelectorAll('td, th');
-                
-                // Only process visible rows
-                if (rows[i].style.display !== 'none') {
-                    for (let j = 0; j < cols.length; j++) {
-                        let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, "").trim();
-                        // Escape quotes
-                        data = data.replace(/"/g, '""');
-                        row.push('"' + data + '"');
-                    }
-                    csv.push(row.join(','));
+                for (let j = 0; j < cols.length; j++) {
+                    let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').trim().replace(/"/g, '""');
+                    row.push('"' + data + '"');
                 }
+                csv.push(row.join(','));
             }
-            
-            downloadCSV(csv.join('\n'), filename);
-        }
-
-        function downloadCSV(csv, filename) {
-            let csvFile = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-            let downloadLink = document.createElement("a");
-            downloadLink.download = filename;
-            downloadLink.href = window.URL.createObjectURL(csvFile);
-            downloadLink.style.display = "none";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+            const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
         }
     </script>
 }
-

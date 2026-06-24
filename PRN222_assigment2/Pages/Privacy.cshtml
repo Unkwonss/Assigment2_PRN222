@@ -4,29 +4,42 @@
     ViewData["Title"] = "Chính sách bảo mật";
 }
 
-<div class="container py-5">
+<div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card-glass p-5">
-                <div class="text-center mb-4 border-bottom border-white border-opacity-10 pb-4">
-                    <h2 class="card-title-gradient justify-content-center mb-2"><i class="bi bi-shield-check"></i> @ViewData["Title"]</h2>
-                    <p class="text-muted-custom">Bảo vệ dữ liệu và quyền riêng tư của bạn là ưu tiên hàng đầu của VietRAG System.</p>
+            <div class="card-glass p-4 p-lg-5">
+                <div class="text-center mb-5 pb-4 border-bottom border-white border-opacity-10">
+                    <div class="feature-icon-ring feature-cyan d-inline-flex mb-3">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h2 class="card-title-gradient justify-content-center mb-2">@ViewData["Title"]</h2>
+                    <p class="text-muted-custom mb-0">Bảo vệ dữ liệu và quyền riêng tư của bạn là ưu tiên hàng đầu của VietRAG System.</p>
                 </div>
 
-                <div class="text-white text-opacity-75" style="line-height: 1.7;">
-                    <h5 class="fw-bold text-glow mb-3 mt-4">1. Thu thập dữ liệu</h5>
-                    <p>Chúng tôi chỉ thu thập các thông tin cần thiết phục vụ cho việc vận hành hệ thống RAG Chatbot, bao gồm:</p>
-                    <ul>
-                        <li>Thông tin tài khoản: Email, Tên người dùng và Vai trò.</li>
-                        <li>Lịch sử hội thoại: Các câu hỏi và ngữ cảnh được gửi đến Chatbot để phục vụ cho việc cải thiện độ chính xác của mô hình sinh.</li>
-                        <li>Tài liệu học liệu: Các tài liệu do Giảng viên/Admin tải lên sẽ được vector hóa và lưu trữ an toàn trong cơ sở dữ liệu.</li>
-                    </ul>
+                <div class="policy-content">
+                    <div class="mb-4 p-4 rounded-3" style="background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);">
+                        <h5 class="fw-bold text-glow mb-3"><i class="bi bi-database me-2"></i>1. Thu thập dữ liệu</h5>
+                        <p class="text-muted-custom mb-2">Chúng tôi chỉ thu thập các thông tin cần thiết phục vụ cho việc vận hành hệ thống RAG Chatbot:</p>
+                        <ul class="text-muted-custom mb-0">
+                            <li class="mb-1">Thông tin tài khoản: Email, Tên người dùng và Vai trò.</li>
+                            <li class="mb-1">Lịch sử hội thoại: Các câu hỏi và ngữ cảnh gửi đến Chatbot.</li>
+                            <li>Tài liệu học liệu: Được vector hóa và lưu trữ an toàn trong cơ sở dữ liệu.</li>
+                        </ul>
+                    </div>
 
-                    <h5 class="fw-bold text-glow mb-3 mt-4">2. Sử dụng thông tin</h5>
-                    <p>Mọi thông tin hội thoại và tài liệu chỉ được sử dụng trong phạm vi môn học và kiểm thử (Benchmark RAGAS) của dự án. Chúng tôi cam kết <strong>không</strong> chia sẻ dữ liệu này cho bất kỳ bên thứ ba nào vì mục đích thương mại.</p>
+                    <div class="mb-4 p-4 rounded-3" style="background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);">
+                        <h5 class="fw-bold text-glow mb-3"><i class="bi bi-eye me-2"></i>2. Sử dụng thông tin</h5>
+                        <p class="text-muted-custom mb-0">
+                            Mọi thông tin chỉ được sử dụng trong phạm vi môn học và kiểm thử Benchmark RAGAS. Chúng tôi cam kết <strong class="text-white">không</strong> chia sẻ dữ liệu cho bên thứ ba vì mục đích thương mại.
+                        </p>
+                    </div>
 
-                    <h5 class="fw-bold text-glow mb-3 mt-4">3. Bảo mật hệ thống</h5>
-                    <p>Hệ thống áp dụng các tiêu chuẩn mã hóa mật khẩu, bảo vệ CSRF và quản lý quyền truy cập nghiêm ngặt dựa trên JWT/Cookie Authentication để đảm bảo an toàn tối đa cho dữ liệu của toàn bộ sinh viên và giảng viên tham gia nền tảng.</p>
+                    <div class="p-4 rounded-3" style="background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);">
+                        <h5 class="fw-bold text-glow mb-3"><i class="bi bi-lock-fill me-2"></i>3. Bảo mật hệ thống</h5>
+                        <p class="text-muted-custom mb-0">
+                            Hệ thống áp dụng mã hóa mật khẩu, bảo vệ CSRF và quản lý quyền truy cập nghiêm ngặt dựa trên Cookie Authentication để đảm bảo an toàn tối đa cho dữ liệu sinh viên và giảng viên.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

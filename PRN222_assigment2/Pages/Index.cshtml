@@ -4,115 +4,219 @@
     ViewData["Title"] = "Trang chủ";
 }
 
-<div class="container-fluid px-4 py-5">
-    <!-- Hero Section -->
-    <div class="row align-items-center mb-5 pb-5">
-        <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
-            <div class="d-inline-flex align-items-center gap-2 mb-3 px-3 py-1 rounded-pill" style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3);">
-                <span class="badge" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff;">Mới</span>
-                <span class="small text-white">Nền tảng học tập ứng dụng AI Sinh tạo</span>
-            </div>
-            <h1 class="display-4 fw-bold mb-4" style="line-height: 1.2;">
-                Hệ thống <span class="card-title-gradient d-inline-block">VietRAG</span><br />
-                Thông minh & Toàn diện
-            </h1>
-            <p class="lead text-muted-custom mb-5" style="max-width: 600px;">
-                Cung cấp giải pháp RAG Chatbot học tập với khả năng trả lời chính xác dựa trên tài liệu độc quyền, đồng thời tích hợp công cụ RAGAS Benchmark chuyên sâu dành cho nghiên cứu và đánh giá mô hình LLM.
-            </p>
-            
-            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
-                @if (User.Identity?.IsAuthenticated == true)
-                {
-                    <a href="/Chat/Index" class="btn btn-glow-primary btn-lg d-flex align-items-center justify-content-center gap-2 px-4">
-                        <i class="bi bi-chat-left-text"></i> Trải nghiệm Chatbot
-                    </a>
-                    <a href="/Benchmark/Index" class="btn btn-outline-glass btn-lg d-flex align-items-center justify-content-center gap-2 px-4">
-                        <i class="bi bi-bar-chart-line"></i> Benchmark Lab
-                    </a>
-                }
-                else
-                {
-                    <a href="/Account/Login" class="btn btn-glow-primary btn-lg d-flex align-items-center justify-content-center gap-2 px-4">
-                        <i class="bi bi-box-arrow-in-right"></i> Bắt đầu ngay
-                    </a>
-                    <a href="/Account/Register" class="btn btn-outline-glass btn-lg d-flex align-items-center justify-content-center gap-2 px-4">
-                        <i class="bi bi-person-plus"></i> Đăng ký tài khoản
-                    </a>
-                }
-            </div>
-        </div>
-        
-        <div class="col-lg-6">
-            <div class="position-relative p-4">
-                <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 rounded-circle" style="background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%); filter: blur(40px); z-index: 0;"></div>
-                <div class="card-glass border border-white border-opacity-10 p-2 position-relative" style="z-index: 1; transform: perspective(1000px) rotateY(-5deg) rotateX(5deg); box-shadow: -20px 20px 50px rgba(0,0,0,0.5);">
-                    <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1000&auto=format&fit=crop" alt="AI Dashboard" class="img-fluid rounded-3 opacity-75" style="border: 1px solid rgba(255,255,255,0.05);" />
-                    
-                    <!-- Floating Badge 1 -->
-                    <div class="position-absolute card-glass py-2 px-3 hover-scale d-none d-md-block" style="bottom: -20px; left: -20px; border-color: rgba(6, 182, 212, 0.3); background: rgba(13, 17, 28, 0.95);">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(6, 182, 212, 0.2); color: #22d3ee;">
-                                <i class="bi bi-lightning-charge-fill fs-5"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 text-white fw-bold">Tốc độ phản hồi</h6>
-                                <small class="text-muted-custom">Siêu tốc ~350ms</small>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Floating Badge 2 -->
-                    <div class="position-absolute card-glass py-2 px-3 hover-scale d-none d-md-block" style="top: -20px; right: -20px; border-color: rgba(16, 185, 129, 0.3); background: rgba(13, 17, 28, 0.95);">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(16, 185, 129, 0.2); color: #34d399;">
-                                <i class="bi bi-shield-check fs-5"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 text-white fw-bold">RAGAS Benchmark</h6>
-                                <small class="text-muted-custom">Độ chính xác >95%</small>
-                            </div>
-                        </div>
-                    </div>
+<div class="container-fluid px-4">
+    <!-- Hero -->
+    <section class="hero-section">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 text-center text-lg-start">
+                <div class="hero-badge">
+                    <span class="badge-new">Mới</span>
+                    <span class="small text-white">Nền tảng học tập ứng dụng AI Sinh tạo</span>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Features Section -->
-    <div class="row g-4 pt-5 pb-4">
-        <div class="col-12 text-center mb-5">
-            <h3 class="fw-bold text-white mb-2">Tính Năng Nổi Bật</h3>
-            <p class="text-muted-custom">Hệ sinh thái công cụ hỗ trợ học tập và nghiên cứu AI tiên tiến</p>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card-glass h-100 p-4 text-center hover-scale">
-                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 64px; height: 64px; background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3);">
-                    <i class="bi bi-chat-dots-fill fs-2"></i>
+                <h1 class="hero-title text-white">
+                    Hệ thống <span class="gradient-text">VietRAG</span><br />
+                    Thông minh &amp; Toàn diện
+                </h1>
+
+                <p class="lead text-muted-custom mb-4" style="max-width: 540px;">
+                    RAG Chatbot học tập với khả năng trả lời chính xác dựa trên tài liệu độc quyền, tích hợp công cụ RAGAS Benchmark chuyên sâu cho nghiên cứu và đánh giá mô hình LLM.
+                </p>
+
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start mb-4">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a href="/Chat/Index" class="btn btn-glow-primary btn-lg d-flex align-items-center justify-content-center gap-2 px-4">
+                            <i class="bi bi-chat-left-text"></i> Trải nghiệm Chatbot
+                        </a>
+                        <a href="/Benchmark/Index" class="btn btn-outline-glass btn-lg d-flex align-items-center justify-content-center gap-2 px-4">
+                            <i class="bi bi-bar-chart-line"></i> Benchmark Lab
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="/Account/Login" class="btn btn-glow-primary btn-lg d-flex align-items-center justify-content-center gap-2 px-4">
+                            <i class="bi bi-box-arrow-in-right"></i> Bắt đầu ngay
+                        </a>
+                        <a href="/Account/Register" class="btn btn-outline-glass btn-lg d-flex align-items-center justify-content-center gap-2 px-4">
+                            <i class="bi bi-person-plus"></i> Đăng ký tài khoản
+                        </a>
+                    }
                 </div>
-                <h5 class="text-white fw-bold mb-3">Chatbot Chuyên Ngành</h5>
-                <p class="text-muted-custom small mb-0">Hệ thống RAG truy xuất chính xác nội dung học liệu của từng môn học, hỗ trợ sinh viên giải đáp thắc mắc 24/7 với độ tin cậy cao nhất.</p>
+
+                <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-start">
+                    <span class="tech-pill"><i class="bi bi-dot text-primary"></i> .NET 9</span>
+                    <span class="tech-pill"><i class="bi bi-dot text-purple"></i> SignalR</span>
+                    <span class="tech-pill"><i class="bi bi-dot text-info"></i> RAGAS</span>
+                    <span class="tech-pill"><i class="bi bi-dot text-success"></i> EF Core</span>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="hero-visual">
+                    <div class="hero-visual-glow"></div>
+                    <div class="card-glass border border-white border-opacity-10 p-2 hero-card-3d">
+                        <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1000&auto=format&fit=crop"
+                             alt="AI Dashboard" class="img-fluid rounded-3 opacity-90"
+                             style="border: 1px solid rgba(255,255,255,0.06);" />
+
+                        <div class="card-glass hero-float-badge bottom-left hover-scale d-none d-md-block">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="stat-icon stat-icon-cyan" style="width:40px;height:40px;font-size:1rem;">
+                                    <i class="bi bi-lightning-charge-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-white small">Tốc độ phản hồi</div>
+                                    <div class="text-muted-custom" style="font-size:0.78rem;">Siêu tốc ~350ms</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-glass hero-float-badge top-right hover-scale d-none d-md-block">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="stat-icon stat-icon-green" style="width:40px;height:40px;font-size:1rem;">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-white small">RAGAS Benchmark</div>
+                                    <div class="text-muted-custom" style="font-size:0.78rem;">Độ chính xác &gt;95%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div class="col-md-4">
-            <div class="card-glass h-100 p-4 text-center hover-scale">
-                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 64px; height: 64px; background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);">
-                    <i class="bi bi-folder-check fs-2"></i>
+    </section>
+
+    <!-- Stats -->
+    <section class="mb-5">
+        <div class="row g-3">
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-primary"><i class="bi bi-chat-dots-fill"></i></div>
+                    <div>
+                        <div class="stat-value">24/7</div>
+                        <div class="stat-label">Hỗ trợ học tập</div>
+                    </div>
                 </div>
-                <h5 class="text-white fw-bold mb-3">Quản Lý Học Liệu Tự Động</h5>
-                <p class="text-muted-custom small mb-0">Giảng viên và Quản trị viên dễ dàng số hóa, quản lý tài liệu. Dữ liệu được chunking và vector hóa hoàn toàn tự động.</p>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-purple"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+                    <div>
+                        <div class="stat-value">PDF</div>
+                        <div class="stat-label">Tự động chunking</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-cyan"><i class="bi bi-diagram-3-fill"></i></div>
+                    <div>
+                        <div class="stat-value">3-Layer</div>
+                        <div class="stat-label">Kiến trúc chuẩn</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-green"><i class="bi bi-graph-up-arrow"></i></div>
+                    <div>
+                        <div class="stat-value">RAGAS</div>
+                        <div class="stat-label">Đánh giá khách quan</div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div class="col-md-4">
-            <div class="card-glass h-100 p-4 text-center hover-scale">
-                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 64px; height: 64px; background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3);">
-                    <i class="bi bi-radar fs-2"></i>
+    </section>
+
+    <!-- Features -->
+    <section class="pb-5">
+        <div class="text-center mb-5">
+            <span class="section-label mb-3"><i class="bi bi-stars"></i> Tính năng</span>
+            <h2 class="fw-bold text-white mt-3 mb-2">Tính Năng Nổi Bật</h2>
+            <p class="text-muted-custom mx-auto" style="max-width: 520px;">
+                Hệ sinh thái công cụ hỗ trợ học tập và nghiên cứu AI tiên tiến
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card-glass h-100 p-4 text-center feature-card hover-lift">
+                    <div class="feature-icon-ring feature-primary">
+                        <i class="bi bi-chat-dots-fill"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-3">Chatbot Chuyên Ngành</h5>
+                    <p class="text-muted-custom small mb-0">
+                        Hệ thống RAG truy xuất chính xác nội dung học liệu của từng môn học, hỗ trợ sinh viên giải đáp thắc mắc 24/7 với độ tin cậy cao nhất.
+                    </p>
                 </div>
-                <h5 class="text-white fw-bold mb-3">Đánh Giá Benchmark</h5>
-                <p class="text-muted-custom small mb-0">Công cụ phân tích độc lập sử dụng bộ tiêu chí RAGAS để đo lường Faithfulness, Relevance, Precision của LLM một cách khách quan.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="card-glass h-100 p-4 text-center feature-card hover-lift">
+                    <div class="feature-icon-ring feature-purple">
+                        <i class="bi bi-folder-check"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-3">Quản Lý Học Liệu</h5>
+                    <p class="text-muted-custom small mb-0">
+                        Giảng viên và Admin dễ dàng số hóa, quản lý tài liệu. Dữ liệu được chunking và vector hóa hoàn toàn tự động.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card-glass h-100 p-4 text-center feature-card hover-lift">
+                    <div class="feature-icon-ring feature-cyan">
+                        <i class="bi bi-radar"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-3">Đánh Giá Benchmark</h5>
+                    <p class="text-muted-custom small mb-0">
+                        Công cụ phân tích sử dụng bộ tiêu chí RAGAS để đo lường Faithfulness, Relevance, Precision của LLM một cách khách quan.
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="pb-5">
+        <div class="card-glass p-4 p-lg-5">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-5">
+                    <span class="section-label mb-3"><i class="bi bi-arrow-repeat"></i> Quy trình</span>
+                    <h3 class="fw-bold text-white mt-3 mb-3">Cách thức hoạt động</h3>
+                    <p class="text-muted-custom mb-0">
+                        Từ tài liệu PDF đến câu trả lời thông minh — toàn bộ pipeline RAG được tự động hóa trong một nền tảng duy nhất.
+                    </p>
+                </div>
+                <div class="col-lg-7">
+                    <div class="row g-3">
+                        @{
+                            var steps = new[] {
+                                ("1", "bi-cloud-upload", "Upload PDF", "Tải tài liệu học liệu lên hệ thống"),
+                                ("2", "bi-scissors", "Chunking", "Phân đoạn văn bản thông minh"),
+                                ("3", "bi-vector-pen", "Embedding", "Vector hóa và lưu trữ"),
+                                ("4", "bi-chat-heart", "Chat RAG", "Trả lời dựa trên ngữ cảnh")
+                            };
+                        }
+                        @foreach (var (num, icon, title, desc) in steps)
+                        {
+                            <div class="col-6">
+                                <div class="d-flex gap-3 align-items-start p-3 rounded-3" style="background:rgba(255,255,255,0.03);border:1px solid var(--border-glass);">
+                                    <div class="stat-icon stat-icon-primary flex-shrink-0" style="width:40px;height:40px;font-size:0.9rem;">
+                                        <i class="bi @icon"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-glow small fw-bold">Bước @num</div>
+                                        <div class="text-white fw-semibold small">@title</div>
+                                        <div class="text-muted-custom" style="font-size:0.78rem;">@desc</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
