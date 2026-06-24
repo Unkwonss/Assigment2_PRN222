@@ -1,8 +1,34 @@
-﻿@page
+@page
 @model PrivacyModel
 @{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Chính sách bảo mật";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card-glass p-5">
+                <div class="text-center mb-4 border-bottom border-white border-opacity-10 pb-4">
+                    <h2 class="card-title-gradient justify-content-center mb-2"><i class="bi bi-shield-check"></i> @ViewData["Title"]</h2>
+                    <p class="text-muted-custom">Bảo vệ dữ liệu và quyền riêng tư của bạn là ưu tiên hàng đầu của VietRAG System.</p>
+                </div>
+
+                <div class="text-white text-opacity-75" style="line-height: 1.7;">
+                    <h5 class="fw-bold text-glow mb-3 mt-4">1. Thu thập dữ liệu</h5>
+                    <p>Chúng tôi chỉ thu thập các thông tin cần thiết phục vụ cho việc vận hành hệ thống RAG Chatbot, bao gồm:</p>
+                    <ul>
+                        <li>Thông tin tài khoản: Email, Tên người dùng và Vai trò.</li>
+                        <li>Lịch sử hội thoại: Các câu hỏi và ngữ cảnh được gửi đến Chatbot để phục vụ cho việc cải thiện độ chính xác của mô hình sinh.</li>
+                        <li>Tài liệu học liệu: Các tài liệu do Giảng viên/Admin tải lên sẽ được vector hóa và lưu trữ an toàn trong cơ sở dữ liệu.</li>
+                    </ul>
+
+                    <h5 class="fw-bold text-glow mb-3 mt-4">2. Sử dụng thông tin</h5>
+                    <p>Mọi thông tin hội thoại và tài liệu chỉ được sử dụng trong phạm vi môn học và kiểm thử (Benchmark RAGAS) của dự án. Chúng tôi cam kết <strong>không</strong> chia sẻ dữ liệu này cho bất kỳ bên thứ ba nào vì mục đích thương mại.</p>
+
+                    <h5 class="fw-bold text-glow mb-3 mt-4">3. Bảo mật hệ thống</h5>
+                    <p>Hệ thống áp dụng các tiêu chuẩn mã hóa mật khẩu, bảo vệ CSRF và quản lý quyền truy cập nghiêm ngặt dựa trên JWT/Cookie Authentication để đảm bảo an toàn tối đa cho dữ liệu của toàn bộ sinh viên và giảng viên tham gia nền tảng.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
