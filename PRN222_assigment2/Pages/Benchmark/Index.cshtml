@@ -511,7 +511,7 @@
                             <td><code class="text-glow text-opacity-75">${r.latencyMilliseconds}ms</code></td>
                             <td><span class="badge bg-primary bg-opacity-15 text-glow">${r.faithfulness}</span></td>
                             <td><span class="badge bg-secondary bg-opacity-15 text-glow" style="color:#d8b4fe !important;">${r.relevance}</span></td>
-                            <td><span class="badge bg-info bg-opacity-15 text-glow" style="color:#22d3ee !important;">${r.precision}</span></td>
+                            <td><span class="badge text-glow" style="background-color: rgba(34, 211, 238, 0.15) !important; color:#22d3ee !important; border: 1px solid rgba(34, 211, 238, 0.3);">${r.precision}</span></td>
                             <td><span class="badge bg-success bg-opacity-15 text-glow" style="color:#34d399 !important;">${r.recall}</span></td>
                             <td class="text-end">
                                 <button class="btn btn-sm btn-outline-glass py-0 px-2" onclick="openDetailsModal('${escapeQuotes(r.questionText)}', '${escapeQuotes(r.groundTruthText)}', '${escapeQuotes(r.generatedResponse)}')">

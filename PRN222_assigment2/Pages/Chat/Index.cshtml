@@ -263,7 +263,17 @@
 </div>
 
 @section Scripts {
+<script src="~/lib/signalr/signalr.min.js"></script>
 <style>
+.signalr-status { position:fixed; bottom:12px; right:12px; z-index:9999; display:flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:.7rem; backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.1); }
+.signalr-status.connected { background:rgba(16,185,129,.15); color:#34d399; border-color:rgba(16,185,129,.3); }
+.signalr-status.disconnected { background:rgba(239,68,68,.15); color:#f87171; border-color:rgba(239,68,68,.3); }
+.signalr-status.connecting { background:rgba(251,191,36,.15); color:#fbbf24; border-color:rgba(251,191,36,.3); }
+.signalr-dot { width:8px; height:8px; border-radius:50%; }
+.signalr-status.connected .signalr-dot { background:#34d399; box-shadow:0 0 6px #34d399; }
+.signalr-status.disconnected .signalr-dot { background:#f87171; }
+.signalr-status.connecting .signalr-dot { background:#fbbf24; animation:pulse 1s infinite; }
+@@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
 .upload-step { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); transition: all .3s; }
 .upload-step.step-active { background: rgba(99,102,241,.15); border-color: rgba(99,102,241,.4); }
 .upload-step.step-done { background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.35); }
@@ -285,6 +295,168 @@
         var activeSessionId = null;
         var activeCitations = {};
         var lastSentMessage = null;
+
+        // ============ SIGNALR CONNECTION SETUP ============
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chatHub")
+            .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        // Connection status indicator
+        function updateSignalRStatus(state) {
+            var el = document.getElementById('signalrStatus');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'signalrStatus';
+                document.body.appendChild(el);
+            }
+            el.className = 'signalr-status ' + state;
+            var labels = { connected: 'SignalR Connected', disconnected: 'SignalR Disconnected', connecting: 'Đang kết nối...' };
+            el.innerHTML = '<span class="signalr-dot"></span>' + (labels[state] || state);
+        }
+
+        // Start connection
+        async function startSignalR() {
+            updateSignalRStatus('connecting');
+            try {
+                await connection.start();
+                console.log("[SignalR] Connected successfully.");
+                updateSignalRStatus('connected');
+            } catch (err) {
+                console.error("[SignalR] Connection failed:", err);
+                updateSignalRStatus('disconnected');
+                setTimeout(startSignalR, 5000);
+            }
+        }
+
+        connection.onreconnecting(function() { updateSignalRStatus('connecting'); });
+        connection.onreconnected(function() {
+            updateSignalRStatus('connected');
+            // Rejoin active session group after reconnect
+            if (activeSessionId) {
+                connection.invoke("JoinSession", activeSessionId).catch(function(e) { console.error(e); });
+            }
+        });
+        connection.onclose(function() { updateSignalRStatus('disconnected'); });
+
+        // ============ SIGNALR EVENT HANDLERS ============
+
+        // Nhận tin nhắn user (real-time từ server push)
+        connection.on("ReceiveUserMessage", function(data) {
+            // Tin nhắn user đã được append locally khi gửi, nên chỉ cần log
+            console.log("[SignalR] User message received:", data.message);
+        });
+
+        // Nhận phản hồi bot (real-time)
+        connection.on("ReceiveBotResponse", function(res) {
+            console.log("[SignalR] Bot response received via SignalR");
+            // Remove typing indicator
+            $("#typingIndicator").remove();
+
+            if (res.success) {
+                activeCitations[res.historyId] = res.citations;
+
+                var isErrorResponse = res.botResponse && (
+                    res.botResponse.includes('Xin lỗi, đã có lỗi xảy ra') ||
+                    res.botResponse.includes('Hệ thống đang bận') ||
+                    res.botResponse.includes('Hệ thống chưa được cấu hình') ||
+                    res.botResponse.includes('Không nhận được phản hồi từ AI')
+                );
+
+                if (isErrorResponse) {
+                    var errorBotHtml = `
+                        <div class="chat-bubble chat-bubble-bot align-self-start" style="border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-exclamation-triangle-fill" style="color:#f87171;"></i>
+                                <span class="fw-semibold" style="color:#fca5a5;">Lỗi phản hồi</span>
+                            </div>
+                            <div class="small" style="color:var(--text-secondary);">${escapeHtml(res.botResponse)}</div>
+                            <div class="mt-2 pt-2 border-top border-white border-opacity-10">
+                                <button class="btn btn-sm py-1 px-3" style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.3);color:#818cf8;font-size:.75rem;" onclick="retryLastMessage()">
+                                    <i class="bi bi-arrow-clockwise"></i> Thử lại
+                                </button>
+                                <span class="text-muted-custom ms-2" style="font-size:0.65rem;"><i class="bi bi-clock"></i> ${res.timestamp}</span>
+                            </div>
+                        </div>
+                    `;
+                    $("#chatMessagesArea").append(errorBotHtml);
+                } else {
+                    var botHtml = `
+                        <div class="chat-bubble chat-bubble-bot align-self-start border border-white border-opacity-10" onclick="showCitationsForHistory('${res.historyId}')">
+                            <div class="bot-text">${formatResponseText(res.botResponse)}</div>
+                            <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-white border-opacity-10" style="font-size:0.7rem;">
+                                <span class="text-muted-custom"><i class="bi bi-clock"></i> ${res.timestamp}</span>
+                                <span class="text-glow cursor-pointer fw-semibold"><i class="bi bi-file-earmark-ruled"></i> Xem ${res.citations.length} trích dẫn nguồn</span>
+                            </div>
+                        </div>
+                    `;
+                    $("#chatMessagesArea").append(botHtml);
+                    showCitationsForHistory(res.historyId);
+                }
+                scrollToBottom();
+            } else {
+                var errorHtml = `
+                    <div class="chat-bubble chat-bubble-bot align-self-start" style="border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <i class="bi bi-exclamation-triangle-fill" style="color:#f87171;"></i>
+                            <span class="fw-semibold small" style="color:#fca5a5;">${escapeHtml(res.message)}</span>
+                        </div>
+                        <button class="btn btn-sm py-1 px-3 mt-1" style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.3);color:#818cf8;font-size:.75rem;" onclick="retryLastMessage()">
+                            <i class="bi bi-arrow-clockwise"></i> Thử lại
+                        </button>
+                    </div>
+                `;
+                $("#chatMessagesArea").append(errorHtml);
+                scrollToBottom();
+            }
+        });
+
+        // Typing indicator real-time
+        connection.on("BotTyping", function(data) {
+            if (data.isTyping) {
+                if ($("#typingIndicator").length === 0) {
+                    var typingHtml = `
+                        <div class="chat-bubble chat-bubble-bot align-self-start border border-white border-opacity-10 d-flex align-items-center gap-2" id="typingIndicator">
+                            <div class="spinner-grow text-glow spinner-grow-sm" role="status" style="width: 8px; height: 8px;"></div>
+                            <div class="spinner-grow text-glow spinner-grow-sm" role="status" style="width: 8px; height: 8px; animation-delay: 0.2s;"></div>
+                            <div class="spinner-grow text-glow spinner-grow-sm" role="status" style="width: 8px; height: 8px; animation-delay: 0.4s;"></div>
+                            <span class="small text-muted-custom">Trợ lý RAG đang suy nghĩ & so khớp tài liệu...</span>
+                        </div>
+                    `;
+                    $("#chatMessagesArea").append(typingHtml);
+                    scrollToBottom();
+                }
+            } else {
+                $("#typingIndicator").remove();
+            }
+        });
+
+        // Real-time session notifications
+        connection.on("SessionCreated", function(data) {
+            console.log("[SignalR] New session created:", data.title);
+            loadSessionsForSubject();
+        });
+
+        connection.on("SessionDeleted", function(data) {
+            console.log("[SignalR] Session deleted:", data.sessionId);
+            if (activeSessionId === data.sessionId) {
+                activeSessionId = null;
+                resetChatSpace();
+            }
+            loadSessionsForSubject();
+        });
+
+        connection.on("SessionRenamed", function(data) {
+            console.log("[SignalR] Session renamed:", data.newTitle);
+            if (activeSessionId === data.sessionId) {
+                $("#activeSessionTitle").text(data.newTitle);
+            }
+            loadSessionsForSubject();
+        });
+
+        // Start SignalR on page load
+        startSignalR();
 
         // --- Load Documents for Subject (sidebar) ---
         function loadDocumentsForSubject(subjectId) {
@@ -442,7 +614,16 @@
 
         // --- 2. Session selection and history retrieval ---
         function selectSession(sessionId, elem) {
+            // Leave previous session group via SignalR
+            if (activeSessionId && connection.state === signalR.HubConnectionState.Connected) {
+                connection.invoke("LeaveSession", activeSessionId).catch(function(e) { console.error(e); });
+            }
             activeSessionId = sessionId;
+
+            // Join new session group via SignalR
+            if (connection.state === signalR.HubConnectionState.Connected) {
+                connection.invoke("JoinSession", sessionId).catch(function(e) { console.error(e); });
+            }
 
             // Highlight selected
             $("#sessionList .session-item").removeClass("active");
@@ -502,7 +683,7 @@
             });
         }
 
-        // --- 4. Send Message (AJAX) ---
+        // --- 4. Send Message (SignalR with AJAX fallback) ---
         function sendChatMessage(e) {
             e.preventDefault();
             var message = $("#chatInputField").val().trim();
@@ -537,26 +718,44 @@
             $("#chatMessagesArea").append(typingHtml);
             scrollToBottom();
 
-            // Parameters from configuration panel
+            // Parameters
+            var modelId = parseInt($("#ragModel").val()) || 1;
+            var strategyId = parseInt($("#ragStrategy").val()) || 1;
+            var chunkSize = parseInt($("#ragSize").val()) || 500;
+            var chunkOverlap = parseInt($("#ragOverlap").val()) || 100;
+
+            // ★ Send via SignalR (real-time) — bot response received via ReceiveBotResponse event
+            if (connection.state === signalR.HubConnectionState.Connected) {
+                connection.invoke("SendMessage", activeSessionId, message, modelId, strategyId, chunkSize, chunkOverlap)
+                    .catch(function(err) {
+                        console.error("[SignalR] SendMessage failed, falling back to AJAX:", err);
+                        sendMessageViaAjax(activeSessionId, message, modelId, strategyId, chunkSize, chunkOverlap);
+                    });
+            } else {
+                // Fallback to AJAX if SignalR is disconnected
+                console.warn("[SignalR] Not connected, using AJAX fallback");
+                sendMessageViaAjax(activeSessionId, message, modelId, strategyId, chunkSize, chunkOverlap);
+            }
+        }
+
+        // AJAX Fallback for sending messages
+        function sendMessageViaAjax(sessionId, message, modelId, strategyId, chunkSize, chunkOverlap) {
             var formData = {
-                sessionId: activeSessionId,
+                sessionId: sessionId,
                 message: message,
-                modelId: $("#ragModel").val() || 1,
-                strategyId: $("#ragStrategy").val() || 1,
-                chunkSize: $("#ragSize").val() || 500,
-                chunkOverlap: $("#ragOverlap").val() || 100,
+                modelId: modelId,
+                strategyId: strategyId,
+                chunkSize: chunkSize,
+                chunkOverlap: chunkOverlap,
                 __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
             };
 
             $.post("/Chat/Index?handler=SendMessage", formData, function (res) {
-                // Remove Typing Indicator
                 $("#typingIndicator").remove();
 
                 if (res.success) {
-                    // Cache citations inside active session
                     activeCitations[res.historyId] = res.citations;
                     
-                    // Check if the bot response is an error message from the AI service
                     var isErrorResponse = res.botResponse && (
                         res.botResponse.includes('Xin lỗi, đã có lỗi xảy ra') ||
                         res.botResponse.includes('Hệ thống đang bận') ||
@@ -565,7 +764,6 @@
                     );
 
                     if (isErrorResponse) {
-                        // Render error bubble with retry
                         var errorBotHtml = `
                             <div class="chat-bubble chat-bubble-bot align-self-start" style="border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);">
                                 <div class="d-flex align-items-center gap-2 mb-2">
@@ -583,11 +781,9 @@
                         `;
                         $("#chatMessagesArea").append(errorBotHtml);
                     } else {
-                        // Render normal Bot bubble
                         var botHtml = `
                             <div class="chat-bubble chat-bubble-bot align-self-start border border-white border-opacity-10" onclick="showCitationsForHistory('${res.historyId}')">
                                 <div class="bot-text">${formatResponseText(res.botResponse)}</div>
-                                
                                 <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-white border-opacity-10" style="font-size:0.7rem;">
                                     <span class="text-muted-custom"><i class="bi bi-clock"></i> ${res.timestamp}</span>
                                     <span class="text-glow cursor-pointer fw-semibold"><i class="bi bi-file-earmark-ruled"></i> Xem ${res.citations.length} trích dẫn nguồn</span>
@@ -595,13 +791,10 @@
                             </div>
                         `;
                         $("#chatMessagesArea").append(botHtml);
-
-                        // Immediately show citations drawer for this message
                         showCitationsForHistory(res.historyId);
                     }
                     scrollToBottom();
                 } else {
-                    // Server returned success=false (validation error etc.)
                     var errorHtml = `
                         <div class="chat-bubble chat-bubble-bot align-self-start" style="border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);">
                             <div class="d-flex align-items-center gap-2 mb-1">
@@ -617,7 +810,6 @@
                     scrollToBottom();
                 }
             }).fail(function(xhr, status, error) {
-                // Network or server error
                 $("#typingIndicator").remove();
                 var errorHtml = `
                     <div class="chat-bubble chat-bubble-bot align-self-start" style="border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);">

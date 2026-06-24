@@ -230,7 +230,7 @@ namespace PRN222_assigment2.Pages.Chat
 
             try
             {
-                await _documentService.UploadDocumentAsync(doc, textContent);
+                doc = await _documentService.UploadDocumentAsync(doc, textContent);
             }
             catch (Exception ex)
             {

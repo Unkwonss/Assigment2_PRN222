@@ -71,6 +71,9 @@ namespace PRN222_assigment2
             // Authorization
             builder.Services.AddAuthorization();
 
+            // SignalR for real-time chat
+            builder.Services.AddSignalR();
+
             var app = builder.Build();
 
             // Seed database
@@ -196,6 +199,9 @@ namespace PRN222_assigment2
             // Map Razor Pages thay vì MapControllerRoute
             app.MapRazorPages();
             app.MapHub<NewsHub>("/newsHub");
+
+            // Map SignalR Hub for real-time chat
+            app.MapHub<ChatHub>("/chatHub");
 
             app.Run();
         }
