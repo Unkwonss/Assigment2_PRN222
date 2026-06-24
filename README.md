@@ -1,5 +1,7 @@
 # VietRAG System - Vietnamese RAG Chatbot & Research Benchmark
 
+![.NET Version](https://img.shields.io/badge/.NET-9.0-blue.svg) ![Entity Framework](https://img.shields.io/badge/EF%20Core-9.0-purple.svg) ![SignalR](https://img.shields.io/badge/SignalR-Real--time-orange.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg)
+
 **VietRAG System** (Vietnamese RAG Chatbot & Research Benchmark) là một nền tảng RAG (Retrieval-Augmented Generation) kết hợp với công cụ đánh giá (Benchmarking) hiệu năng AI. Dự án được thiết kế chuyên biệt để hỗ trợ học tập cho sinh viên và phục vụ nghiên cứu học thuật tại Đại học FPT (hỗ trợ các môn học như PRN222, PRN212, SWP391).
 
 Nền tảng cho phép người dùng thử nghiệm, so sánh và đánh giá các cấu hình RAG khác nhau (sự kết hợp giữa LLM, mô hình Embedding và các chiến lược Chunking) để tìm ra giải pháp tối ưu nhất cho từng bộ dữ liệu tài liệu học tập.
