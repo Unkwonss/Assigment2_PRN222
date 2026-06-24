@@ -580,6 +580,30 @@ namespace PRN222_assigment2.Pages.Document
             return sb.ToString();
         }
 
+        // GET: Download extracted text of document
+        public async Task<IActionResult> OnGetDownloadExtractedTextAsync(int documentId)
+        {
+            var doc = await _documentService.GetDocumentByIdAsync(documentId);
+            if (doc == null)
+            {
+                return NotFound("Tài liệu không tồn tại.");
+            }
+
+            string uploadsDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "uploads", "documents");
+            string textFilePath = Path.Combine(uploadsDir, $"{documentId}_content.txt");
+
+            if (!System.IO.File.Exists(textFilePath))
+            {
+                return NotFound("Không tìm thấy tệp văn bản trích xuất cho tài liệu này.");
+            }
+
+            var textContent = await System.IO.File.ReadAllTextAsync(textFilePath, Encoding.UTF8);
+            var cleanTitle = string.Concat(doc.Title.Split(Path.GetInvalidFileNameChars())).Replace(" ", "_");
+            var fileName = $"{cleanTitle}_extracted.txt";
+
+            return File(Encoding.UTF8.GetBytes(textContent), "text/plain", fileName);
+        }
+
         private static string BuildExceptionDetails(Exception ex)
         {
             var messages = new List<string>();

@@ -169,6 +169,9 @@
                 <div class="card-glass p-0 overflow-hidden shadow-lg mb-4">
                     <div class="p-3 border-bottom border-white border-opacity-10 d-flex justify-content-between align-items-center">
                         <h6 class="fw-bold text-white text-glow mb-0"><i class="bi bi-table"></i> So sánh câu trả lời thực tế & Chỉ số câu hỏi</h6>
+                        <button class="btn btn-sm btn-outline-glass d-flex align-items-center gap-1" onclick="exportBenchmarkResults()">
+                            <i class="bi bi-download"></i> Xuất CSV
+                        </button>
                     </div>
                     <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                         <table class="table table-glass mb-0" style="font-size:0.85rem;">
@@ -836,6 +839,22 @@
         function escapeQuotes(str) {
             if (!str) return "";
             return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // Export benchmark evaluation results as CSV
+        function exportBenchmarkResults() {
+            if (!selectedExperimentId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Chưa chọn thử nghiệm',
+                    text: 'Vui lòng chọn cấu hình thử nghiệm ở cột bên trái để xuất dữ liệu.',
+                    background: 'rgba(13, 17, 28, 0.95)',
+                    color: '#fff',
+                    confirmButtonColor: '#6366f1'
+                });
+                return;
+            }
+            window.open('/Benchmark/Index?handler=ExportCSV&experimentId=' + selectedExperimentId, '_blank');
         }
     </script>
 }
