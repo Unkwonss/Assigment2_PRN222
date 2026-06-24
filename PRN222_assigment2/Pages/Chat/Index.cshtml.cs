@@ -99,6 +99,57 @@ namespace PRN222_assigment2.Pages.Chat
             }));
         }
 
+        // GET: Export session history to Markdown/Text file
+        public async Task<IActionResult> OnGetExportSessionAsync(Guid sessionId)
+        {
+            var history = await _chatService.GetChatHistoryAsync(sessionId);
+            var session = await _chatService.GetSessionByIdAsync(sessionId);
+            if (session == null)
+            {
+                return NotFound("Không tìm thấy cuộc trò chuyện.");
+            }
+
+            var title = session.Title ?? "Cuoc_tro_chuyen";
+            var sb = new StringBuilder();
+            sb.AppendLine($"# Lịch sử hội thoại: {title}");
+            sb.AppendLine($"- **Môn học**: {session.Subject?.SubjectCode} - {session.Subject?.SubjectName}");
+            sb.AppendLine($"- **Ngày xuất**: {DateTime.Now:dd/MM/yyyy HH:mm:ss}");
+            sb.AppendLine();
+            sb.AppendLine("---");
+            sb.AppendLine();
+
+            foreach (var h in history)
+            {
+                // Format timestamp (+7 UTC for local time)
+                var localTime = h.Timestamp?.AddHours(7).ToString("dd/MM/yyyy HH:mm") ?? "N/A";
+                sb.AppendLine($"### 👤 Người dùng ({localTime}):");
+                sb.AppendLine(h.UserMessage);
+                sb.AppendLine();
+                sb.AppendLine($"### 🤖 Trợ lý RAG ({localTime}):");
+                sb.AppendLine(h.BotResponse);
+                sb.AppendLine();
+
+                if (h.ChatCitations != null && h.ChatCitations.Any())
+                {
+                    sb.AppendLine("**📚 Nguồn trích dẫn:**");
+                    int idx = 1;
+                    foreach (var c in h.ChatCitations)
+                    {
+                        var docTitle = c.Chunk?.Index?.Document?.Title ?? "Tài liệu";
+                        sb.AppendLine($"- [{idx++}] {docTitle} (Trang {c.PageNumber}):");
+                        sb.AppendLine($"  > *\"{c.Snippet?.Replace("\n", " ").Replace("\r", "")}\"*");
+                    }
+                    sb.AppendLine();
+                }
+                sb.AppendLine("---");
+                sb.AppendLine();
+            }
+
+            var cleanTitle = string.Concat(title.Split(Path.GetInvalidFileNameChars())).Replace(" ", "_");
+            var fileName = $"{cleanTitle}_History.md";
+            return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/markdown", fileName);
+        }
+
         // AJAX: POST send message
         public async Task<IActionResult> OnPostSendMessageAsync(Guid sessionId, string message, int modelId, int strategyId, int chunkSize, int chunkOverlap)
         {

@@ -116,6 +116,9 @@
                 <button class="btn btn-sm btn-outline-glass py-1 px-2" onclick="openRenameModal()">
                     <i class="bi bi-pencil"></i> Đổi tên
                 </button>
+                <button class="btn btn-sm btn-outline-glass py-1 px-2" onclick="exportChatSession()">
+                    <i class="bi bi-download"></i> Xuất hội thoại
+                </button>
                 <button class="btn btn-sm btn-logout py-1 px-2" onclick="confirmDeleteSession()">
                     <i class="bi bi-trash"></i> Xóa hội thoại
                 </button>
@@ -386,7 +389,10 @@
                         <div class="chat-bubble chat-bubble-bot align-self-start border border-white border-opacity-10" onclick="showCitationsForHistory('${res.historyId}')">
                             <div class="bot-text">${formatResponseText(res.botResponse)}</div>
                             <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-white border-opacity-10" style="font-size:0.7rem;">
-                                <span class="text-muted-custom"><i class="bi bi-clock"></i> ${res.timestamp}</span>
+                                <div>
+                                    <span class="text-muted-custom"><i class="bi bi-clock"></i> ${res.timestamp}</span>
+                                    <span class="text-muted-custom ms-3 cursor-pointer copy-btn" onclick="copyBotMessage(event, this)" title="Sao chép tin nhắn"><i class="bi bi-clipboard"></i> Sao chép</span>
+                                </div>
                                 <span class="text-glow cursor-pointer fw-semibold"><i class="bi bi-file-earmark-ruled"></i> Xem ${res.citations.length} trích dẫn nguồn</span>
                             </div>
                         </div>
@@ -785,7 +791,10 @@
                             <div class="chat-bubble chat-bubble-bot align-self-start border border-white border-opacity-10" onclick="showCitationsForHistory('${res.historyId}')">
                                 <div class="bot-text">${formatResponseText(res.botResponse)}</div>
                                 <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-white border-opacity-10" style="font-size:0.7rem;">
-                                    <span class="text-muted-custom"><i class="bi bi-clock"></i> ${res.timestamp}</span>
+                                    <div>
+                                        <span class="text-muted-custom"><i class="bi bi-clock"></i> ${res.timestamp}</span>
+                                        <span class="text-muted-custom ms-3 cursor-pointer copy-btn" onclick="copyBotMessage(event, this)" title="Sao chép tin nhắn"><i class="bi bi-clipboard"></i> Sao chép</span>
+                                    </div>
                                     <span class="text-glow cursor-pointer fw-semibold"><i class="bi bi-file-earmark-ruled"></i> Xem ${res.citations.length} trích dẫn nguồn</span>
                                 </div>
                             </div>
@@ -846,7 +855,10 @@
                     <div class="bot-text">${formatResponseText(h.botResponse)}</div>
                     
                     <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-white border-opacity-10" style="font-size:0.7rem;">
-                        <span class="text-muted-custom"><i class="bi bi-clock"></i> ${h.timestamp}</span>
+                        <div>
+                            <span class="text-muted-custom"><i class="bi bi-clock"></i> ${h.timestamp}</span>
+                            <span class="text-muted-custom ms-3 cursor-pointer copy-btn" onclick="copyBotMessage(event, this)" title="Sao chép tin nhắn"><i class="bi bi-clipboard"></i> Sao chép</span>
+                        </div>
                         <span class="text-glow cursor-pointer fw-semibold"><i class="bi bi-file-earmark-ruled"></i> Xem ${h.citations.length} trích dẫn nguồn</span>
                     </div>
                 </div>
@@ -1015,6 +1027,29 @@
             if (cites && cites[index]) {
                 highlightCitationCard(cites[index].chunkId);
             }
+        }
+
+        // Copy bot message content to clipboard
+        function copyBotMessage(e, elem) {
+            e.stopPropagation();
+            var bubble = $(elem).closest(".chat-bubble-bot");
+            var text = bubble.find(".bot-text").text();
+            
+            navigator.clipboard.writeText(text).then(function() {
+                var originalHtml = $(elem).html();
+                $(elem).html('<i class="bi bi-check-lg" style="color:#34d399;"></i> <span style="color:#34d399;">Đã chép</span>');
+                setTimeout(function() {
+                    $(elem).html(originalHtml);
+                }, 2000);
+            }).catch(function(err) {
+                console.error("Không thể sao chép:", err);
+            });
+        }
+
+        // Export active chat session to Markdown file
+        function exportChatSession() {
+            if (!activeSessionId) return;
+            window.open('/Chat/Index?handler=ExportSession&sessionId=' + activeSessionId, '_blank');
         }
     </script>
 }
